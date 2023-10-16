@@ -46,8 +46,6 @@ static void initialize (void)
   //LightPtr light = ObjLight::Make(viewer_pos[0],viewer_pos[1],viewer_pos[2]);
   LightPtr light = Light::Make(0.0f,0.0f,0.0f,1.0f,"camera");
 
-  DeskPtr desk = Desk::Make();
-
   AppearancePtr white = Material::Make(1.0f,1.0f,1.0f);
   AppearancePtr red = Material::Make(1.0f,0.5f,0.5f);
   AppearancePtr poff = PolygonOffset::Make(-1,-1);
@@ -64,6 +62,14 @@ static void initialize (void)
   trf3->Rotate(30.0f,0.0f,1.0f,0.0f);
   trf3->Rotate(90.0f,-1.0f,0.0f,0.0f);
   trf3->Scale(0.5f,0.7f,1.0f);
+  TransformPtr trf4 = Transform::Make();
+  trf4->Translate(-1.0f, -1.3f, -1.0f);
+  TransformPtr trf5 = Transform::Make();
+  trf5->Translate(1.0f, -1.3f, 1.0f);
+  TransformPtr trf6 = Transform::Make();
+  trf6->Translate(1.0f, -1.3f, -1.0f);
+  TransformPtr trf7 = Transform::Make();
+  trf7->Translate(-1.0f, -1.3f, 1.0f);
 
   Error::Check("before shps");
   ShapePtr cube = Cube::Make();
@@ -93,9 +99,13 @@ static void initialize (void)
   NodePtr root = Node::Make(shader,
     // {Node::Make(shd_tex,trf1,{desk},{cube}),
     {Node::Make(trf1,{red},{cube}),
+     Node::Make(trf4, {red}, {cube}),
+     Node::Make(trf5, {red}, {cube}),
+     Node::Make(trf6, {red}, {cube}),
+     Node::Make(trf7, {red}, {cube}),
      Node::Make(shd_tex,trf3,{white,poff,paper},{quad}),
     //  Node::Make(trf2,{white},{sphere})
-     Node::Make(shd_tex,trf2,{sphere_tex},{sphere})
+     Node::Make(shd_tex,trf2,{sphere_tex},{sphere}),
     }
   );
   scene = Scene::Make(root);
