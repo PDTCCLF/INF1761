@@ -62,14 +62,22 @@ static void initialize (void)
   trf3->Rotate(30.0f,0.0f,1.0f,0.0f);
   trf3->Rotate(90.0f,-1.0f,0.0f,0.0f);
   trf3->Scale(0.5f,0.7f,1.0f);
-  TransformPtr trf4 = Transform::Make();
-  trf4->Translate(-1.0f, -1.3f, -1.0f);
-  TransformPtr trf5 = Transform::Make();
-  trf5->Translate(1.0f, -1.3f, 1.0f);
-  TransformPtr trf6 = Transform::Make();
-  trf6->Translate(1.0f, -1.3f, -1.0f);
-  TransformPtr trf7 = Transform::Make();
-  trf7->Translate(-1.0f, -1.3f, 1.0f);
+
+  TransformPtr trf_leg1 = Transform::Make();
+  trf_leg1->Scale(0.2f, 2.0f, 0.2f);
+  trf_leg1->Translate(-7.0f, -1.0f, -7.0f);
+
+  TransformPtr trf_leg2 = Transform::Make();
+  trf_leg2->Scale(0.2f, 2.0f, 0.2f);
+  trf_leg2->Translate(-7.0f, -1.0f, 7.0f);
+
+  TransformPtr trf_leg3 = Transform::Make();
+  trf_leg3->Scale(0.2f, 2.0f, 0.2f);
+  trf_leg3->Translate(7.0f, -1.0f, -7.0f);
+
+  TransformPtr trf_leg4 = Transform::Make();
+  trf_leg4->Scale(0.2f, 2.0f, 0.2f);
+  trf_leg4->Translate(7.0f, -1.0f, 7.0f);
 
   Error::Check("before shps");
   ShapePtr cube = Cube::Make();
@@ -78,7 +86,16 @@ static void initialize (void)
   Error::Check("before sphere");
   ShapePtr sphere = Sphere::Make();
   Error::Check("after shps");
-  AppearancePtr sphere_tex = Texture::Make("decal","../../images/stone.jpg");
+  // ShapePtr legShape1 = Cube::Make();
+  // Error::Check("before quad");
+  // ShapePtr legShape2 = Cube::Make();
+  // Error::Check("before quad");
+  // ShapePtr legShape3 = Cube::Make();
+  // Error::Check("before quad");
+  // ShapePtr legShape4 = Cube::Make();
+  // Error::Check("before quad");
+  AppearancePtr sphere_tex = Texture::Make("decal","../../images/earth.jpg");
+  AppearancePtr desk_tex = Texture::Make("decal","../../images/wood.jpg");
 
   // create shader
   //ShaderPtr shader = Shader::Make();
@@ -95,17 +112,21 @@ static void initialize (void)
   shd_tex->AttachFragmentShader("../../shaders/texture/fragment.glsl");
   shd_tex->Link();
 
+  NodePtr desk = Node::Make(shader, {desk_tex},
+  {Node::Make(trf1,{cube}),
+     Node::Make(trf_leg1,{cube}),
+     Node::Make(trf_leg2,{cube}),
+     Node::Make(trf_leg3,{cube}),
+    Node::Make(trf_leg4,{cube}),
+  }
+  );
+
   // build scene
   NodePtr root = Node::Make(shader,
     // {Node::Make(shd_tex,trf1,{desk},{cube}),
-    {Node::Make(trf1,{red},{cube}),
-     Node::Make(trf4, {red}, {cube}),
-     Node::Make(trf5, {red}, {cube}),
-     Node::Make(trf6, {red}, {cube}),
-     Node::Make(trf7, {red}, {cube}),
-     Node::Make(shd_tex,trf3,{white,poff,paper},{quad}),
-    //  Node::Make(trf2,{white},{sphere})
-     Node::Make(shd_tex,trf2,{sphere_tex},{sphere}),
+    {desk,
+     Node::Make(shader,trf3,{white,poff,paper},{quad}),
+     Node::Make(shader,trf2,{sphere_tex},{sphere}),
     }
   );
   scene = Scene::Make(root);

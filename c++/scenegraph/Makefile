@@ -38,14 +38,7 @@ SRC = \
   texture.cpp \
   transform.cpp \
   triangle.cpp \
-  luxor/luxor.cpp \
-  luxor/luxorengine.cpp \
-  luxor/animation.cpp \
-  luxor/movement.cpp \
-  luxor/linearinterpolator.cpp \
-  luxor/cubicinterpolator.cpp \
   main_3d.cpp
-  # main_two_shaders.cpp \
 
 OBJ = $(addsuffix .o, $(basename $(SRC))) 
 
