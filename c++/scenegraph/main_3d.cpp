@@ -24,7 +24,7 @@
 
 #include <iostream>
 
-static float viewer_pos[3] = {2.0f, 3.5f, 4.0f};
+static float viewer_pos[3] = {2.0f, 3.5f, 5.0f};
 
 static ScenePtr scene;
 static Camera3DPtr camera;
