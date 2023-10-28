@@ -21,6 +21,8 @@
 #include "light.h"
 #include "light.h"
 #include "polyoffset.h"
+#include "skybox.h"
+#include "texcube.h"
 
 #include <iostream>
 
@@ -45,6 +47,8 @@ static void initialize (void)
 
   //LightPtr light = ObjLight::Make(viewer_pos[0],viewer_pos[1],viewer_pos[2]);
   LightPtr light = Light::Make(0.0f,0.0f,0.0f,1.0f,"camera");
+
+  SkyBoxPtr skybox = SkyBox::Make();
 
   AppearancePtr white = Material::Make(1.0f,1.0f,1.0f);
   AppearancePtr red = Material::Make(1.0f,0.5f,0.5f);
@@ -96,6 +100,7 @@ static void initialize (void)
   // Error::Check("before quad");
   AppearancePtr sphere_tex = Texture::Make("decal","../../images/earth.jpg");
   AppearancePtr desk_tex = Texture::Make("decal","../../images/wood.jpg");
+  AppearancePtr sky_tex = TexCube::Make("sky","../../images/skybox.png");
 
   // create shader
   //ShaderPtr shader = Shader::Make();
@@ -112,6 +117,11 @@ static void initialize (void)
   shd_tex->AttachFragmentShader("../../shaders/texture/fragment.glsl");
   shd_tex->Link();
 
+  ShaderPtr shd_sky = Shader::Make();
+  shd_sky->AttachVertexShader("../../shaders/skybox/vertex.glsl");
+  shd_sky->AttachFragmentShader("../../shaders/skybox/fragment.glsl");
+  shd_sky->Link();
+
   NodePtr desk = Node::Make(shader, {desk_tex},
   {Node::Make(trf1,{cube}),
      Node::Make(trf_leg1,{cube}),
@@ -124,7 +134,8 @@ static void initialize (void)
   // build scene
   NodePtr root = Node::Make(shader,
     // {Node::Make(shd_tex,trf1,{desk},{cube}),
-    {desk,
+    {Node::Make(shd_sky,{sky_tex},{skybox}),
+     desk,
      Node::Make(shader,trf3,{white,poff,paper},{quad}),
      Node::Make(shader,trf2,{sphere_tex},{sphere}),
     }
