@@ -100,7 +100,7 @@ static void initialize (void)
   // Error::Check("before quad");
   AppearancePtr sphere_tex = Texture::Make("decal","../../images/earth.jpg");
   AppearancePtr desk_tex = Texture::Make("decal","../../images/wood.jpg");
-  AppearancePtr sky_tex = TexCube::Make("sky","../../images/skybox.png");
+  AppearancePtr sky_tex = TexCube::Make("sky","../../images/skybox2.png");
 
   // create shader
   //ShaderPtr shader = Shader::Make();
