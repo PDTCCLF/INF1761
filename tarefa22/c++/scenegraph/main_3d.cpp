@@ -98,8 +98,6 @@ static void initialize (void)
   // Error::Check("before quad");
   // ShapePtr legShape4 = Cube::Make();
   // Error::Check("before quad");
-  AppearancePtr sphere_tex = Texture::Make("decal","../../images/earth.jpg");
-  AppearancePtr desk_tex = Texture::Make("decal","../../images/wood.jpg");
   AppearancePtr sky_tex = TexCube::Make("sky","../../images/skybox2.png");
 
   // create shader
@@ -108,8 +106,8 @@ static void initialize (void)
   //shader->AttachFragmentShader("shader/ilum_vert/fragment.glsl");
   //shader->Link();
   ShaderPtr shader = Shader::Make(light,"world");
-  shader->AttachVertexShader("../../shaders/ilum_frag/vertex.glsl");
-  shader->AttachFragmentShader("../../shaders/ilum_frag/fragment.glsl");
+  shader->AttachVertexShader("../../shaders/sky_reflect/vertex.glsl");
+  shader->AttachFragmentShader("../../shaders/sky_reflect/fragment.glsl");
   shader->Link();
 
   ShaderPtr shd_tex = Shader::Make(light,"world");
@@ -122,7 +120,7 @@ static void initialize (void)
   shd_sky->AttachFragmentShader("../../shaders/skybox/fragment.glsl");
   shd_sky->Link();
 
-  NodePtr desk = Node::Make(shader, {desk_tex},
+  NodePtr desk = Node::Make(shader,
   {Node::Make(trf1,{cube}),
      Node::Make(trf_leg1,{cube}),
      Node::Make(trf_leg2,{cube}),
@@ -137,7 +135,7 @@ static void initialize (void)
     {Node::Make(shd_sky,{sky_tex},{skybox}),
      desk,
      Node::Make(shader,trf3,{white,poff,paper},{quad}),
-     Node::Make(shader,trf2,{sphere_tex},{sphere}),
+     Node::Make(shader,trf2,{sphere}),
     }
   );
   scene = Scene::Make(root);
