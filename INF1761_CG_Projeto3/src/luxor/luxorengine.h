@@ -15,6 +15,7 @@ class LuxorEngine : public Engine {
   AnimationPtr m_curr_anim;
   AnimationPtr m_stand_down_anim;
   AnimationPtr m_jump_forward_anim;
+  AnimationPtr m_turn_head_anim;
   TransformPtr m_trf_all;
   TransformPtr m_trf_base;
   TransformPtr m_trf_haste1;
@@ -46,10 +47,12 @@ class LuxorEngine : public Engine {
   bool JumpForward ();
   bool JumpBackward ();
   void TurnHead (float angle);
+  bool TurnHeadDance ();
   virtual void Update (float dt);
 private:
   void CreateStandDownAnimation ();
   void CreateJumpForwardAnimation ();
+  void CreateTurnHeadDanceAnimation ();
 };
 
 #endif

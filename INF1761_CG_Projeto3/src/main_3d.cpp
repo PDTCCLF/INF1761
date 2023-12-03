@@ -246,33 +246,27 @@ static void keyboard (GLFWwindow* window, int key, int scancode, int action, int
     engine->StandDown();
     engine->Update(1.0f);
   }
-  else if(key==GLFW_KEY_RIGHT && action==GLFW_PRESS){
-      engine->StandDown();
-      engine->JumpForward();
-      engine->Update(2.0f);
-  }
-  else if(key==GLFW_KEY_LEFT && action==GLFW_PRESS){
-      engine->StandDown();
-      engine->JumpBackward();
-      engine->Update(2.0f);
-  }
-  else if(key==GLFW_KEY_RIGHT && action==GLFW_REPEAT){
+  else if(key==GLFW_KEY_RIGHT && (action==GLFW_PRESS || action==GLFW_REPEAT)){
       if(mods&GLFW_MOD_SHIFT)
-        engine->TurnHead(-5.0f);
+        engine->TurnHead(5.0f);
       else{
         engine->StandDown();
         engine->JumpForward();
         engine->Update(2.0f);
       }
   }
-  else if(key==GLFW_KEY_LEFT && action==GLFW_REPEAT){
+  else if(key==GLFW_KEY_LEFT && (action==GLFW_PRESS || action==GLFW_REPEAT)){
       if(mods&GLFW_MOD_SHIFT)
-        engine->TurnHead(5.0f);
+        engine->TurnHead(-5.0f);
       else{
         engine->StandDown();
         engine->JumpBackward();
         engine->Update(2.0f);
       }
+  }
+  else if(key==GLFW_KEY_U && (action==GLFW_PRESS || action==GLFW_REPEAT)){
+        engine->TurnHeadDance();
+        engine->Update(2.0f);
   }
 }
 
