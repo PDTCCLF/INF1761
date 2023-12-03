@@ -52,6 +52,6 @@ run: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f $(TARGET) $(OBJ)
+	del /F /Q $(TARGET) $(OBJ)
 
 
