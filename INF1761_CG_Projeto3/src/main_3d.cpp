@@ -24,9 +24,16 @@
 #include "skybox.h"
 #include "texcube.h"
 #include <iostream>
-#include"variable.h"
-#include"clipplane.h"
-#include"luxor/luxor.h"
+#include "variable.h"
+#include "clipplane.h"
+#include "luxor/luxor.h"
+#include "luxor/interpolator.h"
+#include "luxor/cubicinterpolator.h"
+#include "luxor/linearinterpolator.h"
+#include "luxor/movement.h"
+#include "luxor/luxorengine.h"
+#include "luxor/animation.h"
+
 
 static float viewer_pos[3] = {2.0f, 3.5f, 5.0f};
 
@@ -34,6 +41,7 @@ static ScenePtr scene;
 static ScenePtr reflector;
 static Camera3DPtr camera;
 static ArcballPtr arcball;
+static LuxorEnginePtr engine;
 
 static void initialize (void)
 {
@@ -58,6 +66,8 @@ static void initialize (void)
   SkyBoxPtr skybox = SkyBox::Make();
 
   LuxorPtr luxor = Luxor::Make();
+  engine = luxor->GetEngine();
+  
 
   ClipPlanePtr clipplane = ClipPlane::Make("clipplane", 0.0f, -1.0f, 0.0f, 0.0f);
   ClipPlanePtr clipplane2 = ClipPlane::Make("clipplane", 0.0f, -1.0f, 0.0f, 0.0f);
@@ -228,6 +238,42 @@ static void keyboard (GLFWwindow* window, int key, int scancode, int action, int
 {
   if (key == GLFW_KEY_Q && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GLFW_TRUE);
+  else if(key==GLFW_KEY_UP && action==GLFW_PRESS){
+    engine->StandUp();
+    engine->Update(1.0f);
+  }
+  else if(key==GLFW_KEY_DOWN && action==GLFW_PRESS){
+    engine->StandDown();
+    engine->Update(1.0f);
+  }
+  else if(key==GLFW_KEY_RIGHT && action==GLFW_PRESS){
+      engine->StandDown();
+      engine->JumpForward();
+      engine->Update(2.0f);
+  }
+  else if(key==GLFW_KEY_LEFT && action==GLFW_PRESS){
+      engine->StandDown();
+      engine->JumpBackward();
+      engine->Update(2.0f);
+  }
+  else if(key==GLFW_KEY_RIGHT && action==GLFW_REPEAT){
+      if(mods&GLFW_MOD_SHIFT)
+        engine->TurnHead(-5.0f);
+      else{
+        engine->StandDown();
+        engine->JumpForward();
+        engine->Update(2.0f);
+      }
+  }
+  else if(key==GLFW_KEY_LEFT && action==GLFW_REPEAT){
+      if(mods&GLFW_MOD_SHIFT)
+        engine->TurnHead(5.0f);
+      else{
+        engine->StandDown();
+        engine->JumpBackward();
+        engine->Update(2.0f);
+      }
+  }
 }
 
 static void resize (GLFWwindow* win, int width, int height)
