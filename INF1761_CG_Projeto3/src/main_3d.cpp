@@ -31,6 +31,7 @@
 static float viewer_pos[3] = {2.0f, 3.5f, 5.0f};
 
 static ScenePtr scene;
+static ScenePtr reflector;
 static Camera3DPtr camera;
 static ArcballPtr arcball;
 
@@ -56,9 +57,10 @@ static void initialize (void)
 
   SkyBoxPtr skybox = SkyBox::Make();
 
-  // LuxorPtr luxor = Luxor::Make();
+  LuxorPtr luxor = Luxor::Make();
 
   ClipPlanePtr clipplane = ClipPlane::Make("clipplane", 0.0f, -1.0f, 0.0f, 0.0f);
+  ClipPlanePtr clipplane2 = ClipPlane::Make("clipplane", 0.0f, -1.0f, 0.0f, 0.0f);
   
   AppearancePtr white = Material::Make(1.0f,1.0f,1.0f);
   AppearancePtr blue = Material::Make(0.0f,0.0f,1.0f);
@@ -90,6 +92,13 @@ static void initialize (void)
   trf3->Rotate(30.0f,0.0f,1.0f,0.0f);
   trf3->Rotate(90.0f,-1.0f,0.0f,0.0f);
   trf3->Scale(0.5f,0.7f,1.0f);
+  TransformPtr trf4 = Transform::Make();
+  trf4->Scale(0.03f,0.03f,0.03f);
+  trf4->Translate(-4.0f,0.0f,0.0f);
+
+  TransformPtr trf_floor = Transform::Make();
+  trf_floor->Scale(8.0f,0.3f,3.0f);
+  trf_floor->Translate(0.0f,-1.0f,0.0f);
 
   TransformPtr trf_desk = Transform::Make();
   trf_desk->Scale(3.0f,0.3f,3.0f);
@@ -148,6 +157,12 @@ static void initialize (void)
   shd_tex->Link();
 
 
+  ShaderPtr scene_reflect = Shader::Make(light, "world");
+  scene_reflect->AttachVertexShader("../shaders/scene_reflect/vertex.glsl");
+  scene_reflect->AttachFragmentShader("../shaders/scene_reflect/fragment.glsl");
+  scene_reflect->Link();
+
+
   NodePtr desk = Node::Make(shd_clip, {deskText},
   {Node::Make(trf_desk,{cube}),
      Node::Make(trf_leg1,{cube}),
@@ -162,35 +177,44 @@ static void initialize (void)
       {     
            
           Node::Make({sky_tex},{skybox}),
-          desk,
-          // Node::Make(shd_clip,{luxor->GetNode()}),
-          Node::Make(shd_clip,trf1,{clipplane,white,sphereTex},{sphere}),
-          Node::Make(shd_reflect,trf2,{sphere}),
+          // desk,
+          Node::Make({shd_tex},trf4,{luxor->GetNode()}),
+          Node::Make({shd_clip},trf1,{clipplane,white,sphereTex},{sphere}),
+          Node::Make({shd_reflect},trf2,{sphere}),
   
       }
   );
  
   
   scene = Scene::Make({ root });
+  reflector = Scene::Make(Node::Make({scene_reflect},trf_floor,{clipplane},{cube}));
 }
 
 static void display (GLFWwindow* win)
 { 
   glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear window 
   Error::Check("before render");
-  // glEnable(GL_STENCIL_TEST);
-  // glStencilFunc(GL_NEVER,1,0xFFFF);
-  // glStencilOp(GL_REPLACE,GL_REPLACE,GL_REPLACE);
-  // reflector->Render(camera);
-  // glStencilFunc(GL_EQUAL,1,0xFFFF);
-  // glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-  // glDisable(GL_STENCIL_TEST);
+  glEnable(GL_STENCIL_TEST);
+  glStencilFunc(GL_NEVER,1,0xFFFF);
+  glStencilOp(GL_REPLACE,GL_REPLACE,GL_REPLACE);
+  reflector->Render(camera);
+  glStencilFunc(GL_EQUAL,1,0xFFFF);
+  glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+  NodePtr root=scene->GetRoot();
+  TransformPtr trf=Transform::Make();
+  trf->Scale(1.0f,-1.0f,1.0f);
+  root->SetTransform(trf);
+  glFrontFace(GL_CW);
+  scene->Render(camera);
+  glFrontFace(GL_CCW);
+  root->SetTransform(nullptr);
+  glDisable(GL_STENCIL_TEST);
   scene->Render(camera);
   Error::Check("after render");
-  // glEnable(GL_BLEND);
-  // glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  // reflector->Render(camera);
-  // glDisable(GL_BLEND);
+  glEnable(GL_BLEND);
+  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  reflector->Render(camera);
+  glDisable(GL_BLEND);
 }
 
 static void error (int code, const char* msg)

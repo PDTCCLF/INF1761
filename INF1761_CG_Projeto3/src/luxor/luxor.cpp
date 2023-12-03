@@ -8,15 +8,15 @@
 
 Luxor::Luxor ()
 {
-  MeshPtr base_a = Mesh::Make("./base_a.msh");
-  MeshPtr base_b = Mesh::Make("../../luxor/base_b.msh");
-  MeshPtr haste1 = Mesh::Make("../../luxor/haste1.msh");
-  MeshPtr haste2 = Mesh::Make("../../luxor/haste2.msh");
-  MeshPtr haste3_a = Mesh::Make("../../luxor/haste3_a.msh");
-  MeshPtr haste3_b = Mesh::Make("../../luxor/haste3_b.msh");
-  MeshPtr cupula_a = Mesh::Make("../../luxor/cupula_a.msh");
-  MeshPtr cupula_b = Mesh::Make("../../luxor/cupula_b.msh");
-  MeshPtr lampada = Mesh::Make("../../luxor/lampada.msh");
+  MeshPtr base_a = Mesh::Make("../luxor/base_a.msh");
+  MeshPtr base_b = Mesh::Make("../luxor/base_b.msh");
+  MeshPtr haste1 = Mesh::Make("../luxor/haste1.msh");
+  MeshPtr haste2 = Mesh::Make("../luxor/haste2.msh");
+  MeshPtr haste3_a = Mesh::Make("../luxor/haste3_a.msh");
+  MeshPtr haste3_b = Mesh::Make("../luxor/haste3_b.msh");
+  MeshPtr cupula_a = Mesh::Make("../luxor/cupula_a.msh");
+  MeshPtr cupula_b = Mesh::Make("../luxor/cupula_b.msh");
+  MeshPtr lampada = Mesh::Make("../luxor/lampada.msh");
   MaterialPtr red = Material::Make(1.0f,0.0f,0.0f);
   MaterialPtr white = Material::Make(1.0f,1.0f,1.0f);
   white->SetAmbient(1.0f,1.0f,1.0f);
