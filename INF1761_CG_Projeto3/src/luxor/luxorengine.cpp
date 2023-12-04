@@ -25,7 +25,8 @@ LuxorEngine::LuxorEngine (
 {
   CreateStandDownAnimation();
   CreateJumpForwardAnimation();
-  CreateTurnHeadDanceAnimation();
+  CreateTurnHeadDownAnimation();
+  CreateBackflipAnimation();
 }
 
 LuxorEnginePtr LuxorEngine::Make (
@@ -196,51 +197,158 @@ void LuxorEngine::CreateJumpForwardAnimation ()
   m_jump_forward_anim = Animation::Make({move1,move2,move3,move4});
 }
 
-void LuxorEngine::CreateTurnHeadDanceAnimation ()
+void LuxorEngine::CreateTurnHeadDownAnimation ()
 {
   MovementPtr move1 = Movement::Make(0.3f);
   move1->AddRotation(m_trf_cupula, 
                     LinearInterpolator::Make(glm::vec3(30.0f,0.0f,0.0f),
                                             glm::vec3(60.0f,0.0f,0.0f)
                                             ));
-  // MovementPtr move2 = Movement::Make(0.3f);
-  // move2->AddRotation(m_trf_cupula, 
-  //                   LinearInterpolator::Make(glm::vec3(-130.0f,0.0f,0.0f),
-  //                                           glm::vec3(-160.0f,0.0f,0.0f)
-  //                                           ));
-  // MovementPtr move3 = Movement::Make(0.3f);
-  // move3->AddRotation(m_trf_cupula, 
-  //                   LinearInterpolator::Make(glm::vec3(30.0f,0.0f,0.0f),
-  //                                           glm::vec3(60.0f,0.0f,0.0f)
-  //                                           ));
-  // MovementPtr move4 = Movement::Make(0.3f);
-  // move4->AddRotation(m_trf_cupula, 
-  //                   LinearInterpolator::Make(glm::vec3(30.0f,0.0f,0.0f),
-  //                                           glm::vec3(60.0f,0.0f,0.0f)
-  //                                           ));
-  // m_turn_head_anim = Animation::Make({move1,move2,move3,move4});
-  // MovementPtr move = Movement::Make(0.5f);
-  // move->AddRotation(m_trf_haste1,
-  //                   LinearInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
-  //                                            glm::vec3(-30.0f,0.0f,0.0f)
-  //                                           )
-  //                  );
-  // move->AddRotation(m_trf_haste2,
-  //                   LinearInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
-  //                                            glm::vec3(120.0f,0.0f,0.0f)
-  //                                           )
-  //                  );
-  // move->AddRotation(m_trf_haste3,
-  //                   LinearInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
-  //                                            glm::vec3(-120.0f,0.0f,0.0f)
-  //                                           )
-  //                  );
-  // move->AddRotation(m_trf_cupula,
-  //                   LinearInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
-  //                                            glm::vec3(30.0f,0.0f,0.0f)
-  //                                           )
-  //                  );
   m_turn_head_anim = Animation::Make({move1});
+}
+
+void LuxorEngine::CreateBackflipAnimation ()
+{
+  MovementPtr move1 = Movement::Make(0.3f);
+  move1->AddRotation(m_trf_haste1, 
+                     LinearInterpolator::Make(glm::vec3(-30.0f,0.0f,0.0f),
+                                              glm::vec3(-40.0f,0.0f,0.0f)
+                                             )
+                    );
+  move1->AddRotation(m_trf_haste2, 
+                     LinearInterpolator::Make(glm::vec3(120.0f,0.0f,0.0f),
+                                              glm::vec3(150.0f,0.0f,0.0f)
+                                             )
+                   );
+  move1->AddRotation(m_trf_haste3, 
+                     LinearInterpolator::Make(glm::vec3(-120.0f,0.0f,0.0f),
+                                              glm::vec3(-145.0f,0.0f,0.0f)
+                                             )
+                   );
+  move1->AddRotation(m_trf_cupula, 
+                     LinearInterpolator::Make(glm::vec3(30.0f,0.0f,0.0f),
+                                              glm::vec3(60.0f,0.0f,0.0f)
+                                             )
+                   );
+
+  MovementPtr move2 = Movement::Make(0.5f);
+  move2->AddTranslation(m_trf_all, 
+                        CubicInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
+                                                glm::vec3(0.0f,1.0f,1.0f),
+                                                glm::vec3(0.0f,30.0f,50.0f),
+                                                glm::vec3(0.0f,0.0f,100.0f)
+                                                )
+                        );
+  move2->AddRotation(m_trf_base, 
+                     LinearInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
+                                              glm::vec3(-30.0f,0.0f,0.0f)
+                                             )
+                    );
+  move2->AddRotation(m_trf_haste1, 
+                     LinearInterpolator::Make(glm::vec3(-40.0f,0.0f,0.0f),
+                                              glm::vec3(10.0f,0.0f,0.0f)
+                                             )
+                    );
+  move2->AddRotation(m_trf_haste2, 
+                     LinearInterpolator::Make(glm::vec3(150.0f,0.0f,0.0f),
+                                              glm::vec3(50.0f,0.0f,0.0f)
+                                             )
+                   );
+  move2->AddRotation(m_trf_haste3, 
+                     LinearInterpolator::Make(glm::vec3(-145.0f,0.0f,0.0f),
+                                              glm::vec3(-50.0f,0.0f,0.0f)
+                                             )
+                   );
+  move2->AddRotation(m_trf_cupula, 
+                     LinearInterpolator::Make(glm::vec3(60.0f,0.0f,0.0f),
+                                              glm::vec3(65.0f,0.0f,0.0f)
+                                             )
+                   );
+
+  MovementPtr move3 = Movement::Make(0.5f);
+  move3->AddTranslation(m_trf_all,
+      CubicInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
+                                                glm::vec3(0.0f,1.0f,1.0f),
+                                                glm::vec3(0.0f,30.0f,50.0f),
+                                                glm::vec3(0.0f,0.0f,100.0f)
+                                                )
+  );
+  move3->AddRotation(m_trf_base, 
+                     LinearInterpolator::Make(glm::vec3(0.0f,0.0f,0.0f),
+                                              glm::vec3(180.0f,0.0f,0.0f)
+                                             )
+                    );
+
+  MovementPtr move4 = Movement::Make(0.5f);
+  move4->AddRotation(m_trf_base, 
+                     LinearInterpolator::Make(glm::vec3(180.0f,0.0f,0.0f),
+                                              glm::vec3(0.0f,0.0f,0.0f)
+                                             )
+                    );
+  move4->AddTranslation(m_trf_all, 
+      CubicInterpolator::Make(glm::vec3(0.0f, 0.0f, 0.0f),
+                              glm::vec3(0.0f, 0.0f, 0.0f),
+                              glm::vec3(0.0f, -30.0f, 0.0f),
+                              glm::vec3(0.0f, 0.0f, 0.0f)
+      )
+  );
+
+  MovementPtr move5 = Movement::Make(0.5f);
+  move5->AddTranslation(m_trf_all, 
+                        CubicInterpolator::Make(glm::vec3(0.0f,30.0f,50.0f),
+                                                glm::vec3(0.0f,0.0f,100.0f),
+                                                glm::vec3(0.0f,0.0f,90.0f),
+                                                glm::vec3(0.0f,-1.0f,1.0f)
+                                                )
+                        );
+  move5->AddRotation(m_trf_base, 
+                     LinearInterpolator::Make(glm::vec3(-30.0f,0.0f,0.0f),
+                                              glm::vec3(0.0f,0.0f,0.0f)
+                                             )
+                    );
+  move5->AddRotation(m_trf_haste1, 
+                     LinearInterpolator::Make(glm::vec3(10.0f,0.0f,0.0f),
+                                              glm::vec3(-60.0f,0.0f,0.0f)
+                                             )
+                    );
+  move5->AddRotation(m_trf_haste2, 
+                     LinearInterpolator::Make(glm::vec3(50.0f,0.0f,0.0f),
+                                              glm::vec3(160.0f,0.0f,0.0f)
+                                             )
+                   );
+  move5->AddRotation(m_trf_haste3, 
+                     LinearInterpolator::Make(glm::vec3(-50.0f,0.0f,0.0f),
+                                              glm::vec3(-165.0f,0.0f,0.0f)
+                                             )
+                   );
+  move5->AddRotation(m_trf_cupula, 
+                     LinearInterpolator::Make(glm::vec3(65.0f,0.0f,0.0f),
+                                              glm::vec3(60.0f,0.0f,0.0f)
+                                             )
+                   );
+
+  MovementPtr move6 = Movement::Make(0.3f);
+  move6->AddRotation(m_trf_haste1, 
+                     LinearInterpolator::Make(glm::vec3(-60.0f,0.0f,0.0f),
+                                              glm::vec3(-30.0f,0.0f,0.0f)
+                                             )
+                    );
+  move6->AddRotation(m_trf_haste2, 
+                     LinearInterpolator::Make(glm::vec3(160.0f,0.0f,0.0f),
+                                              glm::vec3(120.0f,0.0f,0.0f)
+                                             )
+                   );
+  move6->AddRotation(m_trf_haste3, 
+                     LinearInterpolator::Make(glm::vec3(-165.0f,0.0f,0.0f),
+                                              glm::vec3(-120.0f,0.0f,0.0f)
+                                             )
+                   );
+  move6->AddRotation(m_trf_cupula, 
+                     LinearInterpolator::Make(glm::vec3(60.0f,0.0f,0.0f),
+                                              glm::vec3(30.0f,0.0f,0.0f)
+                                             )
+                   );
+  m_backflip_anim = Animation::Make({move1,move2,move3,move4,move5,move6});
 }
 
 bool LuxorEngine::StandUp ()
@@ -289,11 +397,32 @@ void LuxorEngine::TurnHead (float angle)
   m_head_angle += angle;
 }
 
-bool LuxorEngine::TurnHeadDance ()
+bool LuxorEngine::TurnHeadDown ()
 {
   m_curr_anim = m_turn_head_anim;
   return true;
 }
+
+bool LuxorEngine::BackflipForward ()
+{
+  if (m_curr_anim || m_status != "down")
+    return false;
+  m_curr_anim = m_backflip_anim;
+  m_reverse = false;
+  m_status = "down";   // next status
+  return true;
+}
+
+bool LuxorEngine::BackflipBackward ()
+{
+  if (m_curr_anim || m_status != "down")
+    return false;
+  m_curr_anim = m_backflip_anim;
+  m_reverse = true;
+  m_status = "down";   // next status
+  return true;
+}
+
 
 void LuxorEngine::Update (float dt)
 {

@@ -314,23 +314,33 @@ static void keyboard (GLFWwindow* window, int key, int scancode, int action, int
   else if(key==GLFW_KEY_RIGHT && (action==GLFW_PRESS || action==GLFW_REPEAT)){
       if(mods&GLFW_MOD_SHIFT)
         engine->TurnHead(5.0f);
-      else{
+      else if (mods&GLFW_MOD_CONTROL){
         engine->StandDown();
         engine->JumpForward();
+        engine->Update(2.0f);
+      }
+      else{
+        engine->StandDown();
+        engine->BackflipForward();
         engine->Update(2.0f);
       }
   }
   else if(key==GLFW_KEY_LEFT && (action==GLFW_PRESS || action==GLFW_REPEAT)){
       if(mods&GLFW_MOD_SHIFT)
         engine->TurnHead(-5.0f);
-      else{
+      else if (mods&GLFW_MOD_CONTROL){
         engine->StandDown();
         engine->JumpBackward();
         engine->Update(2.0f);
       }
+      else{
+        engine->StandDown();
+        engine->BackflipBackward();
+        engine->Update(2.0f);
+      }
   }
   else if(key==GLFW_KEY_U && (action==GLFW_PRESS || action==GLFW_REPEAT)){
-        engine->TurnHeadDance();
+        engine->TurnHeadDown();
         engine->Update(2.0f);
   }
 }
