@@ -43,6 +43,16 @@ static Camera3DPtr camera;
 static ArcballPtr arcball;
 static LuxorEnginePtr engine;
 
+// static GLuint createPatch(void)
+// {
+//   float geom[]={0.0f,0.0f,0.0f,2.0f};
+//   glPatchParameteri(GL_PATCH_VERTICES,1);
+//   GLuint vao=CreateVAO();
+//   CreateBuffer(GL_ARRAY_BUFFER,sizeof(geom),(GLvoid*)geom);
+//   VertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,0,0);
+//   return vao;
+// }
+
 static void initialize (void)
 {
     
@@ -70,10 +80,9 @@ static void initialize (void)
   
 
   ClipPlanePtr clipplane = ClipPlane::Make("clipplane", 0.0f, -1.0f, 0.0f, 0.0f);
-  ClipPlanePtr clipplane2 = ClipPlane::Make("clipplane", 0.0f, -1.0f, 0.0f, 0.0f);
   
   AppearancePtr white = Material::Make(1.0f,1.0f,1.0f);
-  AppearancePtr blue = Material::Make(0.0f,0.0f,1.0f);
+  AppearancePtr blue = Material::Make(0.047f,0.717f,0.949f);
   AppearancePtr poff = PolygonOffset::Make(-1,-1);
   AppearancePtr paper = Texture::Make("decal","../images/paper.jpg");
   AppearancePtr sphereTex = Texture::Make("decal", "../images/earth.jpg");
@@ -107,8 +116,8 @@ static void initialize (void)
   trf4->Translate(-4.0f,0.0f,0.0f);
 
   TransformPtr trf_floor = Transform::Make();
-  trf_floor->Scale(8.0f,0.3f,3.0f);
-  trf_floor->Translate(0.0f,-1.0f,0.0f);
+  trf_floor->Scale(8.0f,-1.1f,3.0f);
+  // trf_floor->Translate(0.0f,-1.0f,0.0f);
 
   TransformPtr trf_desk = Transform::Make();
   trf_desk->Scale(3.0f,0.3f,3.0f);
@@ -162,8 +171,8 @@ static void initialize (void)
 
 
   ShaderPtr shd_tex = Shader::Make(light, "world");
-  shd_tex->AttachVertexShader("../shaders/texture/vertex.glsl");
-  shd_tex->AttachFragmentShader("../shaders/texture/fragment.glsl");
+  shd_tex->AttachVertexShader("../shaders/texture light/vertex.glsl");
+  shd_tex->AttachFragmentShader("../shaders/texture light/fragment.glsl");
   shd_tex->Link();
 
 
@@ -173,7 +182,7 @@ static void initialize (void)
   scene_reflect->Link();
 
 
-  NodePtr desk = Node::Make(shd_clip, {deskText},
+  NodePtr desk = Node::Make(shd, {deskText},
   {Node::Make(trf_desk,{cube}),
      Node::Make(trf_leg1,{cube}),
      Node::Make(trf_leg2,{cube}),
@@ -182,49 +191,105 @@ static void initialize (void)
   });
 
   NodePtr root = Node::Make(
-      shd,
-      {fdensity,fcolor},
+      shd_clip,
       {     
            
-          Node::Make({sky_tex},{skybox}),
-          // desk,
-          Node::Make({shd_tex},trf4,{luxor->GetNode()}),
-          Node::Make({shd_clip},trf1,{clipplane,white,sphereTex},{sphere}),
-          Node::Make({shd_reflect},trf2,{sphere}),
+          // Node::Make({sky_tex},{skybox}),
+          //desk,
+          Node::Make(trf4,{luxor->GetNode()}),
+          // Node::Make({shd_clip},trf1,{clipplane,white,sphereTex},{sphere}),
+          //Node::Make({shd_reflect},trf2,{sphere}),
   
       }
   );
  
   
-  scene = Scene::Make({ root });
+  scene = Scene::Make({root});
   reflector = Scene::Make(Node::Make({scene_reflect},trf_floor,{clipplane},{cube}));
+  // reflector = Scene::Make(Node::Make({scene_reflect},trf_floor,{clipplane2},{cube}));
 }
 
 static void display (GLFWwindow* win)
-{ 
-  glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear window 
+{
+  glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   Error::Check("before render");
   glEnable(GL_STENCIL_TEST);
-  glStencilFunc(GL_NEVER,1,0xFFFF);
-  glStencilOp(GL_REPLACE,GL_REPLACE,GL_REPLACE);
-  reflector->Render(camera);
-  glStencilFunc(GL_EQUAL,1,0xFFFF);
-  glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
-  NodePtr root=scene->GetRoot();
-  TransformPtr trf=Transform::Make();
-  trf->Scale(1.0f,-1.0f,1.0f);
-  root->SetTransform(trf);
-  glFrontFace(GL_CW);
-  scene->Render(camera);
-  glFrontFace(GL_CCW);
-  root->SetTransform(nullptr);
+
+      // Draw floor
+      glStencilFunc(GL_ALWAYS, 1, 0xFF); // Set any stencil to 1
+      glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+      glStencilMask(0xFF); // Write to stencil buffer
+      glDepthMask(GL_FALSE); // Don't write to depth buffer
+      glClear(GL_STENCIL_BUFFER_BIT); // Clear stencil buffer (0 by default)
+      reflector->Render(camera);
+      // glDisable(GL_CULL_FACE);
+
+      // Draw cube reflection
+      glEnable(GL_CULL_FACE);
+      glStencilFunc(GL_EQUAL, 1, 0xFF); // Pass test if stencil value is 1
+      glStencilMask(0x00); // Don't write anything to stencil buffer
+      glDepthMask(GL_TRUE); // Write to depth buffer
+      NodePtr root=scene->GetRoot();
+      TransformPtr trf=Transform::Make();
+      trf->Scale(1.0f,-1.0f,1.0f);
+      root->SetTransform(trf);
+      glFrontFace(GL_CW);
+
+      scene->Render(camera);
+
   glDisable(GL_STENCIL_TEST);
+
+  root->SetTransform(nullptr);
   scene->Render(camera);
   Error::Check("after render");
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
-  reflector->Render(camera);
-  glDisable(GL_BLEND);
+
+
+
+  // glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear window 
+  
+  // Error::Check("before render");
+  // //desenha refletor no stencil
+  // glEnable(GL_STENCIL_TEST);
+  // glStencilFunc(GL_NEVER,1,0xFFFF);
+  // glStencilOp(GL_REPLACE,GL_REPLACE,GL_REPLACE);
+  // reflector->Render(camera);
+  // //desenha cena refletida
+  // glStencilFunc(GL_EQUAL,1,0xFFFF);
+  // glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+  // glDisable(GL_STENCIL_TEST);
+  // scene->Render(camera);
+  // glEnable(GL_BLEND);
+  // glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  // reflector->Render(camera);
+  // glDisable(GL_BLEND);
+
+  // glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear window 
+  // Error::Check("before render");
+  // glEnable(GL_STENCIL_TEST);
+  // glStencilFunc(GL_NEVER,1,0xFFFF);
+  // glStencilOp(GL_REPLACE,GL_REPLACE,GL_REPLACE);
+  // reflector->Render(camera);
+  // glStencilFunc(GL_EQUAL,1,0xFFFF);
+  // glStencilOp(GL_KEEP,GL_KEEP,GL_KEEP);
+  // NodePtr root=scene->GetRoot();
+  // TransformPtr trf=Transform::Make();
+  // trf->Scale(1.0f,-1.0f,1.0f);
+  // trf->Translate(0.0f,-3.0f,0.0f);
+  // root->SetTransform(trf);
+  // glFrontFace(GL_CW);
+  // scene->Render(camera);
+  // glFrontFace(GL_CCW);
+  // root->SetTransform(nullptr);
+  // glDisable(GL_STENCIL_TEST);
+  // glDepthMask(GL_FALSE);
+  // scene->Render(camera);
+  // glDepthMask(GL_TRUE);
+  // Error::Check("after render");
+  // glEnable(GL_BLEND);
+  // glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+  // reflector->Render(camera);
+  // glDisable(GL_BLEND);
+  
 }
 
 static void error (int code, const char* msg)

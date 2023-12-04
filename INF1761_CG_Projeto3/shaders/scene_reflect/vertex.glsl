@@ -2,21 +2,18 @@
 
 layout(location = 0) in vec4 pos;
 layout(location = 1) in vec3 normal;
+layout(location = 3) in vec2 texcoord;
 
-uniform vec4 cpos;  // camera pos in lighting space
-uniform mat4 Mv; 
-uniform mat4 Mn; 
+uniform mat4 Mv;
 uniform mat4 Mvp;
-
-out data {
-  vec3 normal;
-  vec3 view;
-} v;
+uniform vec4 clipplane[1];
+out float gl_ClipDistance[1];
 
 void main (void) 
 {
   vec3 p = vec3(Mv*pos);
-  v.view = normalize(vec3(cpos)-p);
-  v.normal = normalize(vec3(Mn*vec4(normal,0.0f)));
-  gl_Position = Mvp*pos; 
+  vec4 p2 = Mv*pos;
+  gl_Position = Mvp*pos;
+  gl_ClipDistance[0] = dot(clipplane[0],p2); 
 }
+
